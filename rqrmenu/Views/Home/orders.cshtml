@@ -1,0 +1,19 @@
+﻿@model IEnumerable<rqrmenu.Areas.Dashboard.Models.Order>
+
+<h2>Orders for Table @Model.FirstOrDefault()?.TableId</h2>
+
+@foreach (var order in Model)
+{
+    <div>
+        <h4>Order Id: @order.Id</h4>
+        <p>Quantity: @order.Quantity</p>
+        <p>Total Amount: @order.TotalAmount</p>
+
+        <ul>
+            @foreach (var item in order.OrderItems)
+            {
+                <li>Item: @item.Item.Name, Extra: @item.OrderItemExtras, Price: @item.Price</li>
+            }
+        </ul>
+    </div>
+}

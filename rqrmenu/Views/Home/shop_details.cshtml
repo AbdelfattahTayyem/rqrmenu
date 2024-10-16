@@ -1,0 +1,89 @@
+﻿@model rqrmenu.Areas.Dashboard.Models.Item
+
+@{
+    ViewData["Title"] = "Shop Details";
+}
+
+<div class="breadcumb-wrapper breadcumb-layout1 background-image link-inherit mb-30" data-vs-img="../assets/img/breadcumb-bg-1-1.jpg" data-overlay="black" data-opacity="6">
+    <div class="container z-index-common">
+        <div class="breadcumb-content text-center pt-65 pt-lg-140 pb-95 pb-lg-175">
+            <h1 class="breadcumb-title sec-title1 text-white my-0">Shop Details</h1>
+            <ul class="breadcumb-menu-style1 bg-white">
+                <li><a href="index.html"><i class="fal fa-home text-theme"></i>Home</a></li>
+                <li class="active">Shop Details</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<section class="vs-product-wrapper product-details-layout1 pt-lg-150 pt-60 pb-lg-120 pb-30">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="product-img vs-carousel slick-dots-white arrow-white" data-slidetoshow="1" data-dots="true" data-arrows="true">
+                    <div>
+                        <img src="@Url.Content("~/images/" + Model.Image)" alt="Food Image" class="w-100">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 align-self-center pt-4 pt-lg-0">
+                <div class="product-content">
+                    <div class="price text-bold mb-10 text-lg">
+                        <span class="text-theme">@Model.Price @Model.Currency</span>
+                    </div>
+
+                    <h2 class="product-title h3">@Model.Name</h2>
+
+                    <form method="post" asp-action="Shop_Details" asp-route-id="@Model.Id">
+                        <input type="hidden" name="ItemId" value="@Model.Id" />
+                        <input type="hidden" name="TableId" value="@ViewBag.TableId" />
+
+                        <div class="vs-list-style1 mb-30">
+                            @foreach (var extra in Model.Extras)
+                            {
+                                <div class="checkbox">
+                                    <input type="checkbox" class="form-check-input" id="extra_@extra.Id" name="selectedExtras" value="@extra.Id" />
+                                    <label class="form-check-label" for="extra_@extra.Id">@extra.Name - @extra.Price</label>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="quantity-box mr-10 justify-content-start mb-4 mb-xl-0">
+                            <button type="button" class="quantity-minus qut-btn"><i class="far fa-minus"></i></button>
+                            <input type="text" name="quantity" value="1" class="qty-input" />
+                            <button type="button" class="quantity-plus qut-btn"><i class="far fa-plus"></i></button>
+                        </div>
+
+                        <button type="submit" class="vs-btn style1 rounded-0">Order Now</button>
+                    </form>
+
+                    <div class="border-top py-15 mt-30 link-inherit list-style-none">
+                        <ul>
+                            <li class="mb-2">
+                                <strong>Categories:</strong>
+                                @if (Model.Category != null)
+                                {
+                                    <a href="#">@Model.Category.Name</a>
+                                }
+                                else
+                                {
+                                    <span>No Category</span> <!-- Display something else if Category is null -->
+                                }
+                            </li>
+                        </ul>
+                    </div>
+
+
+                </div>
+            </div>
+
+            <ul class="nav product-tab-style1 mt-lg-60 mt-30" id="productTab" role="tablist">
+                <li>
+                    <a id="description-tab" data-toggle="tab" href="#description" role="tab" aria-controls="description" aria-selected="false" class="">Description</a>
+                    <h5>@Model.Description</h5>
+                </li>
+            </ul>
+        </div>
+    </div>
+</section>

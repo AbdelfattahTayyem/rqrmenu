@@ -1,0 +1,124 @@
+﻿@model IEnumerable<rqrmenu.Areas.Dashboard.Models.Item>
+
+@{
+    ViewData["Title"] = "Shop";
+}
+<script>
+    function addToCart(itemId) {
+        var form = $("#addToCartForm-" + itemId);
+
+        $.ajax({
+            url: '/Home/AddToCart', // Your AddToCart action URL
+            type: 'POST',
+            data: form.serialize(), // Serialize form data
+            success: function (response) {
+                if (response.success) {
+                    alert(response.message); // Optionally show success message
+                    // Update cart item count (assuming you have an element for this)
+                    $("#cartItemCount").text(response.totalItems);
+                } else {
+                    alert("Failed to add item to cart");
+                }
+            },
+            error: function () {
+                alert("An error occurred while adding the item to cart.");
+            }
+        });
+    }
+</script>
+
+<!--==============================
+    Breadcrumb
+============================== -->
+<div class="breadcumb-wrapper breadcumb-layout1 background-image link-inherit mb-30" data-vs-img="../assets/img/breadcumb-bg-1-1.jpg" data-overlay="black" data-opacity="6">
+    <div class="container z-index-common">
+        <div class="breadcumb-content text-center pt-65 pt-lg-140 pb-95 pb-lg-175">
+            <h1 class="breadcumb-title sec-title1 text-white my-0">Shop</h1>
+            <ul class="breadcumb-menu-style1 bg-white">
+                <li><a href="index.html"><i class="fal fa-home text-theme"></i>Home</a></li>
+                <li class="active">Shop</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!--==============================
+    Shop Area
+==============================-->
+<section class="vs-product-wrapper link-inherit vs-product-layout1 pt-lg-150 pt-60 pb-lg-120 pb-30">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <div class="product-sort-bar d-md-flex text-center justify-content-between align-items-center pb-lg-30 pb-30">
+                    <div class="sort-bar-left">
+                        <h2 class="h5 bar-title mb-lg-0 text-font1">Showing 1–@Model.Count() results</h2>
+                    </div>
+                    <select name="productShort" id="productShort" class="select2">
+                        <option value="Shortbylatest">Short by latest</option>
+                        <option value="Shortbyrecent">Short by Recent</option>
+                        <option value="Shortbypopular">Short by Popular</option>
+                        <option value="Shortbyrelevant">Short by Relevant</option>
+                    </select>
+                </div>
+            </div>
+
+            @foreach (var item in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="vs-product">
+                        <div class="product-header">
+                            <div class="product-img">
+                                @if (!string.IsNullOrEmpty(item.Image))
+                                {
+                                    <img src="@Url.Content("~/images/" + item.Image)" alt="@item.Name" class="w-100">
+                                }
+                                else
+                                {
+                                    <img src="@Url.Content("~/images/default-image.png")" alt="Default Product Image" class="w-100">
+                                }
+                            </div>
+                            <div class="action-buttons">
+                                <a href="@Url.Content("~/images/" + item.Image)" target="_blank">
+                                    <i class="fas fa-search"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="product-body px-15 px-lg-30 py-15 py-lg-30">
+                            <div class="product-content">
+                                <div class="price text-bold mb-10">
+                                    <span class="text-theme">@item.Price @item.Currency</span>
+                                </div>
+                                <h3 class="product-title h4">
+                                    <a asp-action="Shop_Details" asp-route-id="@item.Id">@item.Name</a>
+                                </h3>
+                                <a class="vs-btn style1 rounded-0" asp-action="Checkout" asp-route-id="@item.Id">Order Now</a>
+
+                                <!-- Add to Cart Form -->
+                                <form id="addToCartForm-@item.Id" class="d-inline">
+                                    <input type="hidden" name="itemId" value="@item.Id" />
+                                    <input type="hidden" name="itemName" value="@item.Name" />
+                                    <input type="hidden" name="price" value="@item.Price" />
+                                    <input type="hidden" name="imageUrl" value="@item.Image" />
+                                    <button class="icon-btn bg-theme rounded-0" type="button" onclick="addToCart(@item.Id)">
+                                        <i class="far fa-shopping-cart"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-wrapper pagination-layout1 list-style-none pt-lg-30 mb-30">
+            <ul>
+                <li><a href="#"><i class="fas fa-chevron-left"></i></a></li>
+                <li><a href="#" class="active">1</a></li>
+                <li><a href="#">2</a></li>
+                <li><a href="#">3</a></li>
+                <li><a href="#"><i class="fas fa-chevron-right"></i></a></li>
+            </ul>
+        </div>
+    </div>
+</section>

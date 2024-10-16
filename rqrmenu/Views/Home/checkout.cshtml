@@ -1,0 +1,192 @@
+﻿@model List<rqrmenu.Areas.Dashboard.Models.Order>
+
+@{
+    ViewData["Title"] = "Checkout";
+}
+<script type="text/javascript">
+    var countdown = 900; // 15 minutes in seconds
+    var timer = setInterval(function () {
+        countdown--;
+        var minutes = Math.floor(countdown / 60);
+        var seconds = countdown % 60;
+
+        document.getElementById("timer").innerText = minutes + "m " + seconds + "s ";
+
+        if (countdown <= 0) {
+            clearInterval(timer);
+            alert("Session expired. Please place your order again.");
+            window.location.href = '@Url.Action("Shop")';
+        }
+    }, 1000);
+</script>
+
+<div class="breadcumb-wrapper breadcumb-layout1 background-image link-inherit mb-30" data-vs-img="../assets/img/breadcumb-bg-1-1.jpg" data-overlay="black" data-opacity="6">
+    <div class="container z-index-common">
+        <div class="breadcumb-content text-center pt-65 pt-lg-140 pb-95 pb-lg-175">
+            <h1 class="breadcumb-title sec-title1 text-white my-0">Checkout</h1>
+            <ul class="breadcumb-menu-style1 bg-white">
+                <li><a href="index.html"><i class="fal fa-home text-theme"></i>Home</a></li>
+                <li class="active">Checkout</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="vs-checkout-area pt-lg-150 pt-60 pb-lg-120 pb-30">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-xl-6">
+                <div>
+                    <h2>Checkout Timer</h2>
+                    <p>Complete your order before: <span id="timer"></span></p>
+                </div>
+                @foreach (var order in Model)
+                {
+                    <p>Order Total Amount: @order.TotalAmount</p>
+
+                    <!-- Form for applying coupon for each order -->
+                    <form method="post" asp-action="ApplyCoupon" class="vs-cart-coupon pb-5 form-group text-center">
+                        <label for="coupon-field">Have a coupon code for this order?</label>
+                        <input class="form-control mb-4" type="text" id="coupon-field" name="couponCode" placeholder="Enter coupon code" required>
+
+                        <!-- Pass the total amount for the specific order -->
+                        <input type="hidden" name="totalAmount" value="@order.TotalAmount" />
+
+                        <button type="submit" class="vs-btn mask-style2">Submit</button>
+                    </form>
+                }
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-xl-6">
+                <form action="#" class="vs-billing-differentAddress">
+                    <div class="row">
+                        <!-- Billing details form fields -->
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-xl-6">
+                <div class="vs-orderinfo-wrap mb-30 mt-5 mt-xl-0 px-15 px-md-30 py-15 py-md-30 bg-light-theme">
+                    <div class="table-responsive">
+                        <table class="table table-borderless checkout-ordertable">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model == null || !Model.Any())
+                                {
+                                    <tr>
+                                        <td colspan="2">No orders found.</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    foreach (var order in Model)
+                                    {
+                                        if (order.OrderItems == null || !order.OrderItems.Any())
+                                        {
+                                            <tr>
+                                                <td colspan="2">No items in this order.</td>
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                            foreach (var item in order.OrderItems)
+                                            {
+                                                if (item.Item != null) // Check if the item is not null
+                                                {
+                                                    <tr>
+                                                        <td>@item.Item.Name</td>
+                                                        <td>@item.Price.ToString("C")</td>
+                                                    </tr>
+                                                }
+
+                                                if (item.OrderItemExtras != null && item.OrderItemExtras.Any())
+                                                {
+                                                    foreach (var orderItemExtra in item.OrderItemExtras)
+                                                    {
+                                                        if (orderItemExtra.OrderItemId.Equals(item.Id))
+                                                        {
+                                                            var extra = orderItemExtra.Extra;
+                                                            if (extra != null) // Ensure extra is not null
+                                                            {
+                                                                <tr>
+                                                                    <td>(+) @extra.Name</td>
+                                                                    <td>@extra.Price.ToString("C")</td>
+                                                                </tr>
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                            // Display total amount
+                                            <tr>
+                                                <td>Total Amount</td>
+                                                <td>@order.TotalAmount.ToString("C")</td>
+                                            </tr>
+
+                                            // Display discount if available
+                                            @if (TempData["Discount"] != null && Convert.ToDecimal(TempData["Discount"]) > 0)
+                                            {                                                <tr>
+                                                    <td>Discount</td>
+                                                    <td>-@Convert.ToDecimal(TempData["Discount"]).ToString("C")</td>
+                                                    
+                                                </tr>
+                                            }
+
+                                            <tr>
+                                                <td>Final Amount</td>
+                                                <td>
+                                                    @if (TempData["FinalAmount"] != null)
+                                                    {
+                                                        if (TempData["FinalAmount"].ToString() == "Free")
+                                                        {
+                                                            <span>Free</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>@TempData["FinalAmount"]</span>
+                                                        }
+                                                    }
+                                                </td>
+                                            </tr>
+
+                                        }
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="vs-checkout-payment pt-2 pb-2">
+                        <h4 class="title">Select Payment Method</h4>
+                        <div class="form-group mb-0">
+                            <input type="radio" name="payment-check" id="cashPayment">
+                            <label for="cashPayment">Cash</label>
+                        </div>
+                        <div class="form-group mb-0">
+                            <input type="radio" name="payment-check" id="paypalPayment">
+                            <label for="paypalPayment">Paypal</label>
+                        </div>
+                    </div>
+                    <div class="vs-checkout-submit">
+                        <p class="text mb-10">
+                            Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our privacy policy.
+                        </p>
+                        <div class="form-group mb-4 d-flex">
+                            <input type="checkbox" name="checkoutTerms" id="checkoutTerms" required>
+                            <label for="checkoutTerms" class="pl-10">I have read and agree to the website terms and conditions</label>
+                        </div>
+                        <button type="submit" class="vs-btn mask-style2 bg-white">Place Order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

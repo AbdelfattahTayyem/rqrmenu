@@ -1,0 +1,115 @@
+﻿@model List<rqrmenu.Areas.Dashboard.Models.CartItem>
+@{
+    ViewData["Title"] = "cart";
+}
+
+
+<!-- Your existing HTML structure for the cart -->
+
+
+<!--==============================
+Breadcumb
+============================== -->
+<div class="breadcumb-wrapper breadcumb-layout1 background-image link-inherit mb-30" data-vs-img="../assets/img/breadcumb-bg-1-1.jpg" data-overlay="black" data-opacity="6">
+    <div class="container z-index-common">
+        <div class="breadcumb-content text-center pt-65 pt-lg-140 pb-95 pb-lg-175">
+            <h1 class="breadcumb-title sec-title1 text-white my-0">Cart</h1>
+            <ul class="breadcumb-menu-style1 bg-white">
+                <li><a href="index.html"><i class="fal fa-home text-theme"></i>Home</a></li>
+                <li class="active">Cart</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!--==============================
+Cart Area
+==============================-->
+<div class="vs-cart-wrapper py-lg-150 py-60">
+    <div class="container">
+        <div class="cart-table table-responsive">
+            <table class="table table-bordered mb-0">
+                <thead>
+                    <tr>
+                        <th class="cart-col-image" scope="col">Image</th>
+                        <th class="cart-col-itemname" scope="col">Item Name</th>
+                        <th class="cart-col-price" scope="col">Price</th>
+                        <th class="cart-col-quantity" scope="col">Quantity</th>
+                        <th class="cart-col-total" scope="col">Total</th>
+                        <th class="cart-col-remove" scope="col">Remove</th>
+                    </tr>
+                </thead>
+            <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                <a href="/Item/details/@item.ItemId" class="cart-itemimage">
+                   <img src="~/images/@item.ImageUrl" alt="item image">
+                </a>
+            </td>
+            <td>
+                <a href="/product/details/@item.ItemId" class="cart-itemname">@item.ItemName</a>
+            </td>
+            <td class="cart-price">@item.Price.ToString("C")</td>
+            <td>
+                <div class="quantity-box">
+                    <form method="post" asp-action="UpdateCart">
+                        <input type="hidden" name="itemId" value="@item.ItemId" />
+                        <button type="submit" class="quantity-minus qut-btn"><i class="far fa-minus"></i></button>
+                        <input type="text" name="quantity" value="@item.Quantity" class="qty-input">
+                        <button type="submit" class="quantity-plus qut-btn"><i class="far fa-plus"></i></button>
+                    </form>
+                </div>
+            </td>
+            <td>
+                <span class="cart-totalprice">@item.Total.ToString("C")</span>
+            </td>
+            <td>
+                <form method="post" asp-action="RemoveFromCart">
+                                    <input type="hidden" name="itemId" value="@item.ItemId" />
+                    <button class="cart-removeproduct"><i class="fas fa-times"></i></button>
+                </form>
+            </td>
+        </tr>
+    }
+</tbody>
+
+            </table>
+        </div>
+        <div class="vs-cart-bottom mt-4">
+            <div class="row justify-content-end">
+                <div class="col-md-6 col-lg-4">
+                    @{
+                        var subtotal = Model.Sum(item => item.Total);
+                        var tax = subtotal * 0.1m;
+                        var total = subtotal + tax;
+                    }
+
+                    <div class="vs-cart-summary">
+                        <h3 class="summary-title">Cart Totals</h3>
+                        <table class="table table-totals">
+                            <tbody>
+                                <tr>
+                                    <td>Subtotal</td>
+                                    <td>@subtotal.ToString("C")</td>
+                                </tr>
+                                <tr>
+                                    <td>Tax</td>
+                                    <td>@tax.ToString("C")</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td>Order Total</td>
+                                    <td>@total.ToString("C")</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        <a asp-action="Checkout" class="vs-btn mask-style1">Proceed To Checkout</a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

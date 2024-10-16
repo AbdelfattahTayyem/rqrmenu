@@ -1,0 +1,79 @@
+﻿@model IEnumerable<rqrmenu.Areas.Dashboard.Models.Item>
+
+@{
+    ViewData["Title"] = "Items";
+}
+
+<div class="container mt-5">
+    <h3 class="mb-4">Item List</h3>
+    <!-- Search Bar -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <a asp-action="add_item"><button type="button" class="btn btn-light">ADD</button></a>
+        </div>
+    </div>
+
+    <!-- Item Table -->
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Currency</th>
+                <th>Extra Name - Extra Price</th>
+                <th>Description</th>
+                <th>Image</th>
+                <th>Actions</th> <!-- New column for actions -->
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.Id)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Category.Name)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Price)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Currency)</td>
+                    <td>
+                        @foreach (var extra in item.Extras)
+                        {
+                            <div>@extra.Name - @extra.Price</div>
+                        }
+                    </td>
+                    <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.Image))
+                        {
+                            <img src="~/images/@item.Image" alt="@item.Name" style="width: 60px; height: 65px;" />
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Edit_item" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Edit</a>
+                        <a asp-action="Delete_Item" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="row">
+        <div class="col-md-6">
+            <p>Showing 1 to 10 of 36 entries</p>
+        </div>
+        <div class="col-md-6 text-end">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-end">
+                    <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
